@@ -17,20 +17,24 @@
 // along with microscope. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "imagepreview.hpp"
-
 #include <QtGui/QPainter>
+#include <QtCore/QDebug>
+#include <QtGui/QCloseEvent>
+
+#include "imagepreview.hpp"
 
 
 ImagePreview::ImagePreview(QWidget *parent)
     : QWidget(parent),
-    pix(new QPixmap())
+    pix(new QPixmap()),
+    pixScaled(new QPixmap())
 {
 }
 
 ImagePreview::ImagePreview(QString label, QWidget *parent)
     : QWidget(parent),
-    pix(new QPixmap())
+    pix(new QPixmap()),
+    pixScaled(new QPixmap())
 {
     this->label = label;
 }
@@ -38,6 +42,7 @@ ImagePreview::ImagePreview(QString label, QWidget *parent)
 ImagePreview::~ImagePreview()
 {
     delete pix;
+    delete pixScaled;
 }
 
 QPixmap ImagePreview::getPixmap()
@@ -50,74 +55,55 @@ void ImagePreview::setLabel(QString label)
     this->label = label;
 }
 
-void ImagePreview::paintEvent(QPaintEvent *event)
+void ImagePreview::paintEvent(QPaintEvent *)
 {
-    if (pix->height() <= 0)
+    if (pix->height() <= 0 || pix->width() <= 0)
         return;
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    int labelHeight = 60;
-
-    // Pix data
-    double pixRatio = pix->width() / pix->height();
+    int border = 20;
     double pixWidth = pix->width();
     double pixHeight = pix->height();
+    double winWidth = width() - border;
+    double winHeight = height() - border;
 
-    // Full size data
-    double fullHeight = this->height();
-    double fullWidth = this->width();
-
-    // Widget data
-    double winHeight = this->height() - labelHeight;
-    double winWidth = this->width();
-
-    // Data for draw
-    double x, y;
-    
     // Calculate data and draw the images
-    if (pixWidth < winWidth && pixHeight < winHeight) {
-        // The pixmap is smaller than the widget. Center the pixmap and leave
-        // the size as it is.
-        x = (winWidth - pixWidth) / 2;
-        y = (winHeight - pixHeight) / 2 + labelHeight;
-        painter.drawPixmap(x, y, *pix);
+    if (pixWidth <= winWidth) {
+        painter.drawPixmap(
+            static_cast<int>((winWidth - pixWidth) / 2),
+            static_cast<int>((winHeight - pixHeight) / 2),
+            *pix
+        );
     } else {
-        // The pixmaps' width or height is bigger than the widgets one. Scale
-        // the image down to fit the bigger side and center the other one.
-        QPixmap tmpPix;
-        if ((pixWidth - winWidth) > (pixHeight - winHeight)) {
-            // The width is higher as the border than the height
-            tmpPix = pix->scaledToWidth(
-                winWidth, Qt::TransformationMode::SmoothTransformation
-            );
-            x = 0;
-            y = (winHeight - tmpPix.height()) / 2 + labelHeight;
-        } else {
-            // The height is higher as the border than the width
-            tmpPix = pix->scaledToHeight(
-                winHeight, Qt::TransformationMode::SmoothTransformation
-            );
-            x = (winWidth - tmpPix.width()) / 2;
-            y = labelHeight;
-        }
-        painter.drawPixmap(x, y, tmpPix);
+        *pixScaled = pix->scaledToWidth(
+            static_cast<int>(winWidth),
+            Qt::TransformationMode::SmoothTransformation
+        );
+        painter.drawPixmap(
+            static_cast<int>(
+                (winWidth - pixScaled->width()) / 2 + border / 2
+            ),
+            static_cast<int>(
+                (winHeight - pixScaled->height()) / 2 + border / 2
+            ),
+            *pixScaled
+        );
     }
 
-    // Draw a border around the image
-    QPen pen;
-    pen.setColor(QColor("gray"));
-    pen.setWidth(5);
-    painter.setPen(pen);
-    painter.drawRect(0, 0, fullWidth, fullHeight);
-    pen.setColor(QColor("black"));
-    painter.setPen(pen);
-    painter.drawText(20, labelHeight / 2, label);
+    if (height() != pixScaled->height())
+        emit pixmapHeightChanged(pixScaled->height());
 }
 
 void ImagePreview::setPixmap(QPixmap &pix)
 {
     *(this->pix) = pix;
     repaint();
+}
+
+void ImagePreview::closeEvent(QCloseEvent *event)
+{
+    // Do nothing! Tis window should not be closeable by the window system!
+    event->ignore();
 }

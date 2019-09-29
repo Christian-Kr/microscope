@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>924</width>
-    <height>704</height>
+    <width>478</width>
+    <height>348</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>924</width>
+     <width>478</width>
      <height>18</height>
     </rect>
    </property>
@@ -86,7 +86,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actTakeImage"/>
-   <addaction name="actSwitchCameraView"/>
+   <addaction name="actStiching"/>
+   <addaction name="actAutoCamStit"/>
   </widget>
   <action name="actTakeImage">
    <property name="text">

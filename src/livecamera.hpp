@@ -24,60 +24,64 @@
 #include <opencv2/opencv.hpp>
 
 
+///
+/// \brief The LiveCamera class, showing a live image from the usb-camera
+/// The camera stream will be catched from opencv VideoCapture object. There is
+/// no own driver or streaming implementation.
+///
 class LiveCamera : public QObject
 {
     Q_OBJECT
 
 public:
-    /**
-     * Constructor
-     * @param parent Parent object
-     */
+    ///
+    /// \brief Constructor
+    /// \param parent Parent object
+    ///
     explicit LiveCamera(QObject *parent = nullptr);
 
-    /**
-     * Destructor
-     */
-    ~LiveCamera();
+    ///
+    /// \brief Destructor
+    ///
+    virtual ~LiveCamera() override;
 
-    /**
-     * Set the video capture device
-     * @param cap The video capture device
-     * @return The old object or nullptr
-     */
+    ///
+    /// \brief Set the video capture device
+    /// \param cap The video capture device
+    /// \return The old object or nullptr
+    ///
     cv::VideoCapture* setVideoCaptureDevice(cv::VideoCapture *cap);
 
 public slots:
-    /**
-     * Show the live camera image
-     */
+    ///
+    /// \brief Show the live camera image
+    ///
     void runLiveCamera();
 
-    /**
-     * Exit loop if running
-     */
+    ///
+    /// \brief Exit loop if running
+    ///
     void exitLiveCamera();
 
-    /**
-     * Get the current live image
-     * @return The current live image as cv::Mat
-     */
+    ///
+    /// \brief Get the current live image
+    /// \return The current live image as cv::Mat
+    ///
     cv::Mat getCurrentImage();
 
 signals:
-    /**
-     * Emited when live image has been updated
-     */
+    ///
+    /// \brief Emited when live image has been updated
+    ///
     void liveImageUpdated();
 
-    /**
-     * Exit finish
-     */
+    ///
+    /// \brief Exit finish
+    ///
     void liveCameraExit();
 
 private:
     bool exit;
-
     cv::Mat *liveImage;
     cv::VideoCapture *videoCapture;
 };

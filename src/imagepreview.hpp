@@ -23,58 +23,72 @@
 #include <QtWidgets/QWidget>
 
 
-/**
- * Image preview of the so far calculated one
- */ 
+///
+/// \brief Image preview of the so far calculated one
+///
 class ImagePreview : public  QWidget
 {
     Q_OBJECT
 
 public:
-    /**
-     * Constructor
-     * @param parent Parent widget
-     */
+    ///
+    /// \brief Constructor
+    /// \param parent Parent widget
+    ///
     explicit ImagePreview(QWidget *parent = nullptr);
 
-    /**
-     * Overloaded constructor
-     * @param parent Parent widget
-     * @param label Label of the widget
-     */
+    ///
+    /// \brief Overloaded constructor
+    /// \param parent Parent widget
+    /// \param label Label of the widget
+    ///
     explicit ImagePreview(QString label, QWidget *parent = nullptr);
 
-    /**
-     * Destructor
-     */
-    virtual ~ImagePreview();
+    ///
+    /// \brief Destructor
+    ///
+    virtual ~ImagePreview() override;
 
-    /**
-     * Set the pixmap to preview
-     * @param pix THe pixmap object
-     */
+    ///
+    /// \brief Set the pixmap to preview
+    /// \param pix THe pixmap object
+    ///
     void setPixmap(QPixmap &pix);
 
-    /**
-     * Return the currently set pixmap
-     * @return Pixmap copy
-     */
+    ///
+    /// \brief Return the currently set pixmap
+    /// \return Pixmap copy
+    ///
     QPixmap getPixmap();
 
-    /**
-     * Set label to draw
-     */
+    ///
+    /// \brief Set label to draw
+    ///
     void setLabel(QString label);
 
+signals:
+    ///
+    /// \brief Pixmap height changed
+    /// \param height The new height of the scaled image
+    ///
+    void pixmapHeightChanged(int height);
+
 protected:
-    /**
-     * Override the paint event method to draw the image
-     * @param event The paint event
-     */
-    virtual void paintEvent(QPaintEvent *event) override;
+    ///
+    /// \brief Override the paint event method to draw the image
+    /// \param event The paint event
+    ///
+    virtual void paintEvent(QPaintEvent *) override;
+
+    ///
+    /// \brief Override the close event method
+    /// \param event The close event
+    ///
+    virtual void closeEvent(QCloseEvent *) override;
 
 private:
     QPixmap *pix;
+    QPixmap *pixScaled;
     QString label;
 };
 

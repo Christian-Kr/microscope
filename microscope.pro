@@ -36,8 +36,7 @@ HEADERS += \
 
 FORMS += \
     ui/mainwin.ui \
-    ui/about.ui \
-    ui/stitchingwidget.ui
+    ui/about.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

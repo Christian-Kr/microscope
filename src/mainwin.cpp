@@ -32,6 +32,7 @@
 #include <QtCore/QSettings>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QScrollArea>
 
 #include "mainwin.hpp"
 #include "livecamera.hpp"
@@ -52,37 +53,26 @@ MainWin::MainWin(QWidget *parent, Qt::WindowFlags flags)
     thread(new QThread()),
     liveCamera(new LiveCamera()),
     guiMode(GuiMode::NORMAL),
-    preview(new ImagePreview(tr("Normal"), this)),
-    previewLiveCamera(new ImagePreview(tr("Live Camera"), this)),
-    layoutMain(new QHBoxLayout()),
-    layoutImages(new QGridLayout()),
+    preview(new ImagePreview()),
+    previewLiveCamera(new ImagePreview()),
+    layoutMain(new QVBoxLayout()),
     controller(new Controller()),
     gridNumMaxX(5),
-    gridNumMaxY(5)
+    gridNumMaxY(5),
+    stitchWidget(new StitchingWidget())
 {
     ui.setupUi(this);
 
     liveCamera->moveToThread(thread);
     thread->start();
 
-    QVBoxLayout *layoutLivePreview = new QVBoxLayout(this);
-    layoutLivePreview->addWidget(previewLiveCamera);
-    layoutLivePreview->addSpacerItem(
-        new QSpacerItem(
-            100, 100, QSizePolicy::Policy::Expanding,
-            QSizePolicy::Policy::Expanding
-        )
-    );
-    layoutMain->addLayout(layoutLivePreview);
-
     QScrollArea *scrollArea = new QScrollArea(this);
-    scrollArea->setLayout(layoutImages);
-    layoutMain->addWidget(scrollArea);
-    centralWidget()->setLayout(layoutMain);
+    scrollArea->setWidget(stitchWidget);
+    setCentralWidget(scrollArea);
 
     preview->setVisible(false);
     previewLiveCamera->setVisible(false);
-    previewLiveCamera->setMinimumSize(QSize(400, 400));
+    previewLiveCamera->setWindowTitle(tr("Live camera"));
 
     // Update gui elements
     ui.tbCamera->setVisible(false);
@@ -131,7 +121,6 @@ void MainWin::buildConnections()
     connect(
         thread, &QThread::finished, liveCamera, &QObject::deleteLater
     );
-
     connect(
         controller, &Controller::ready, this, &MainWin::controllerReady
     );
@@ -237,32 +226,16 @@ void MainWin::liveCameraExit()
 
 void MainWin::takeImage()
 {
-    qDebug() << "Here";
     cv::Mat liveMat;
     liveCamera->getCurrentImage().copyTo(liveMat);
     mats->push_back(liveMat);
-
-    // Create a new preview for the image and add it to the layout
-    ImagePreview *preview = new ImagePreview(
-        QString("Image no. %1").arg(mats->size()),
-        this
-    );
-    QPixmap pixTmp = MainWin::matToPixmap(liveMat);
-    preview->setPixmap(pixTmp);
-
-    // Get the number of current previews
-    int numCurrPrev = mats->size() - 1;
-    int y = static_cast<int>(numCurrPrev / gridNumMaxY);
-    int x = numCurrPrev - (y * gridNumMaxY);
-
-    layoutImages->addWidget(preview, y, x);
-    preview->setFixedSize(QSize(200, 200));
+    stitchWidget->addImage(liveMat);
 }
-
-// ---- NEW NEW NEW
 
 void MainWin::runAutoCameraStitching()
 {
+    // The camera and the controller needs to be connected. If they are not
+    // the system will try to connect them, otherwise abort the process.
     if (!cameraConnected) {
         cameraConnected = initCamera();
         if (!cameraConnected)
@@ -313,30 +286,16 @@ void MainWin::runAutoCameraStitching()
     controller->moveToNextPos();
 }
 
-void MainWin::runCameraStitching()
+void MainWin::controllerReady()
 {
-    // TODO: Do camera stitching
-
-    if (cameraConnected == false) {
-        cameraConnected = initCamera();
-        if (!cameraConnected)
-            return;
+    qDebug() << "Controller ready";
+    if (guiMode == GuiMode::AUTOMATIC_CAMERA_STITCHING) {
+        takeImage();
+        if (!controller->hasReachedPosEnd())
+            controller->moveToNextPos();
+        else
+            stitchImages();
     }
-}
-
-void MainWin::abortCameraStitching()
-{
-    liveCamera->exitLiveCamera();
-    guiMode = GuiMode::NORMAL;
-}
-
-void MainWin::abortAutoCameraStitching()
-{
-    if (guiMode != GuiMode::AUTOMATIC_CAMERA_STITCHING)
-        return;
-
-    liveCamera->exitLiveCamera();
-    guiMode = GuiMode::NORMAL;
 }
 
 void MainWin::stitchImages()
@@ -368,6 +327,34 @@ void MainWin::stitchImages()
     // Send picture to preview widget
     preview->setPixmap(tmpPix);
     preview->setVisible(true);
+}
+
+// ---- NEW NEW NEW
+
+void MainWin::runCameraStitching()
+{
+    // TODO: Do camera stitching
+
+    if (cameraConnected == false) {
+        cameraConnected = initCamera();
+        if (!cameraConnected)
+            return;
+    }
+}
+
+void MainWin::abortCameraStitching()
+{
+    liveCamera->exitLiveCamera();
+    guiMode = GuiMode::NORMAL;
+}
+
+void MainWin::abortAutoCameraStitching()
+{
+    if (guiMode != GuiMode::AUTOMATIC_CAMERA_STITCHING)
+        return;
+
+    liveCamera->exitLiveCamera();
+    guiMode = GuiMode::NORMAL;
 }
 
 QPixmap MainWin::matToPixmap(cv::Mat mat)
@@ -459,27 +446,12 @@ void MainWin::saveImage()
     }
 }
 
-void MainWin::saveResults()
-{
-    // TODO: Save results
-}
-
 void MainWin::exit()
 {
     close();
 }
 
-void MainWin::controllerReady()
-{
-    qDebug() << "Controller ready";
-    if (guiMode == GuiMode::AUTOMATIC_CAMERA_STITCHING) {
-        takeImage();
-        if (!controller->hasReachedPosEnd())
-            controller->moveToNextPos();
-        else
-            stitchImages();
-    }
-}
+
 
 void MainWin::updatePreview()
 {
@@ -491,10 +463,19 @@ void MainWin::closeEvent(QCloseEvent *event)
 {
     QMainWindow::closeEvent(event);
 
+    if (cameraConnected)
+        connectCamera();
+
     QSettings settings;
     settings.setValue("window_width", width());
     settings.setValue("window_height", height());
     settings.sync();
+}
+
+void MainWin::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+    stitchWidget->setGeometry(0, 0, width(), stitchWidget->height());
 }
 
 void MainWin::openImage()

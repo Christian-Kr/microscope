@@ -22,36 +22,70 @@
 
 #include <QtWidgets/QWidget>
 
-#include "ui_stitchingwidget.h"
-
 
 class LiveCamera;
 class QGridLayout;
 class ImagePreview;
 namespace cv { class Mat; };
 
-/**
- * Widget showing all stitching images and buttons to handle them properly
- */
+///
+/// \brief Widget showing all stitching images
+///
 class StitchingWidget : public  QWidget
 {
     Q_OBJECT
 
 public:
-    /**
-     * Constructor
-     * @param parent Parent widget
-     */
+    ///
+    /// \brief Constructor
+    /// \param parent Parent widget
+    ///
     explicit StitchingWidget(QWidget *parent = nullptr);
 
-    /**
-     * Destructor
-     */
-    virtual ~StitchingWidget();
+    ///
+    /// \brief Destructor
+    ///
+    virtual ~StitchingWidget() override;
+
+    ///
+    /// \brief Add an image
+    /// \param mat An openvc map of the image
+    ///
+    void addImage(cv::Mat mat);
+
+    ///
+    /// \brief Get the mats vector object
+    /// \return The mats vector
+    ///
+    QVector<cv::Mat> getImages() const;
+
+    ///
+    /// \brief Set number of columns
+    /// \param rows Number of images in one row
+    ///
+    void setColumns(int columns);
+
+    ///
+    /// \brief Update the size and positions of preview images
+    ///
+    void updatePreviews();
+
+protected:
+    ///
+    /// \brief Override resize event method from QWidget
+    ///
+    virtual void resizeEvent(QResizeEvent *event) override;
+
+    ///
+    /// \brief Update the height of the widget
+    ///
+    virtual void updateHeight();
 
 private:
     QGridLayout *layStitchImages;
+    QList<ImagePreview *> *previews;
     QVector<cv::Mat> *mats;
+    int columns;
 };
 
 

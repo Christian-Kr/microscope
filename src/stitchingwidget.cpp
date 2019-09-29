@@ -26,12 +26,15 @@
 #include "stitchingwidget.hpp"
 #include "livecamera.hpp"
 #include "imagepreview.hpp"
+#include "mainwin.hpp"
 
 
 StitchingWidget::StitchingWidget(QWidget *parent)
     : QWidget(parent),
     layStitchImages(new QGridLayout(this)),
-    mats(new QVector<cv::Mat>())
+    previews(new QList<ImagePreview *>()),
+    mats(new QVector<cv::Mat>()),
+    columns(5)
 {
 }
 
@@ -39,4 +42,64 @@ StitchingWidget::~StitchingWidget()
 {
     delete layStitchImages;
     delete mats;
+
+    while (!previews->isEmpty())
+        delete previews->takeFirst();
+    delete previews;
+}
+
+void StitchingWidget::addImage(cv::Mat mat)
+{
+    mats->append(mat);
+
+    // Get pixmap of the mat object and add it as new preview
+    QPixmap pix = MainWin::matToPixmap(mat);
+    ImagePreview *preview = new ImagePreview(this);
+    preview->setVisible(true);
+    preview->setPixmap(pix);
+    previews->append(preview);
+    updatePreviews();
+}
+
+void StitchingWidget::updatePreviews()
+{
+    // The width is given by the number of columns and the total width of
+    // the widget.
+    int imageWidth = width() / columns;
+    for (int i = 0; i < previews->size(); i++) {
+        ImagePreview *preview = previews->at(i);
+        int row = static_cast<int>(i / columns);
+        int column = i - (row * columns);
+        preview->setGeometry(
+            column * imageWidth,
+            row * 200,
+            imageWidth,
+            200
+        );
+    }
+    updateHeight();
+}
+
+void StitchingWidget::updateHeight()
+{
+    if (!previews->isEmpty()) {
+        int rows = static_cast<int>(previews->size() / columns);
+        setGeometry(0, 0, width(), (rows + 1) * previews->first()->height());
+    }
+}
+
+void StitchingWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    updatePreviews();
+}
+
+QVector<cv::Mat> StitchingWidget::getImages() const
+{
+    return *mats;
+}
+
+void StitchingWidget::setColumns(int columns)
+{
+    this->columns = columns;
 }

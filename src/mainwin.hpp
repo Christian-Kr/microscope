@@ -33,7 +33,8 @@ class LiveCamera;
 class ImagePreview;
 class Controller;
 class QGridLayout;
-class QHBoxLayout;
+class QVBoxLayout;
+class StitchingWidget;
 
 ///
 /// Enum class for declaration of different gui modes:
@@ -107,7 +108,10 @@ public slots:
     void runCameraStitching();
 
     ///
-    /// Run automatic image stitching
+    /// \brief Run automatic image stitching
+    /// This function will control the motors over the arduino device to move
+    /// the microscope one step and take an image. This procedure will be
+    /// repeated till the distance limits are reached.
     ///
     void runAutoCameraStitching();
 
@@ -167,11 +171,6 @@ public slots:
     void saveImage();
 
     /**
-     * Save the results
-     */
-    void saveResults();
-
-    /**
      * Controller is ready for doing more
      */
     void controllerReady();
@@ -199,10 +198,15 @@ signals:
     void runLiveCamera();
 
 protected:
-    /**
-     * Override from QMainWindow
-     */
+    ///
+    /// Override close event from QMainWindow
+    ///
     virtual void closeEvent(QCloseEvent *event) override;
+
+    ///
+    /// Override resize event from QMainWindow
+    ///
+    virtual void resizeEvent(QResizeEvent *event) override;
 
 private:
     ///
@@ -284,13 +288,15 @@ private:
 
     ImagePreview *preview;
     ImagePreview *previewLiveCamera;
-    QHBoxLayout *layoutMain;
+    QVBoxLayout *layoutMain;
     QGridLayout *layoutImages;
 
     Controller *controller;
 
     int gridNumMaxX;
     int gridNumMaxY;
+
+    StitchingWidget *stitchWidget;
 };
 
 
