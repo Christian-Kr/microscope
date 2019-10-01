@@ -74,6 +74,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actAppendImage"/>
+   <addaction name="actDeleteImage"/>
    <addaction name="actImageStitching"/>
   </widget>
   <widget class="QToolBar" name="tbCamera">
@@ -89,29 +90,11 @@
    <addaction name="actTakeImage"/>
    <addaction name="actAutoCamStit"/>
   </widget>
-  <widget class="QToolBar" name="tbStitchingTools">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
   <action name="actTakeImage">
+   <property name="icon">
+    <iconset resource="../rsrc/mainresources.qrc">
+     <normaloff>:/icons/icons/edit-download.svg</normaloff>:/icons/icons/edit-download.svg</iconset>
+   </property>
    <property name="text">
     <string>Take Image</string>
    </property>
@@ -154,6 +137,10 @@
    </property>
   </action>
   <action name="actAutoCamStit">
+   <property name="icon">
+    <iconset resource="../rsrc/mainresources.qrc">
+     <normaloff>:/icons/icons/edit-select-all.svg</normaloff>:/icons/icons/edit-select-all.svg</iconset>
+   </property>
    <property name="text">
     <string>Auto Camera Stitching</string>
    </property>
@@ -269,6 +256,10 @@
    </property>
   </action>
   <action name="actDeleteImage">
+   <property name="icon">
+    <iconset resource="../rsrc/mainresources.qrc">
+     <normaloff>:/icons/icons/edit-delete.svg</normaloff>:/icons/icons/edit-delete.svg</iconset>
+   </property>
    <property name="text">
     <string>Delete</string>
    </property>

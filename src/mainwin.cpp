@@ -372,6 +372,14 @@ void MainWin::stitchImages()
     preview->setVisible(true);
 }
 
+void MainWin::deleteImage()
+{
+    ImagePreview *preview = stitchWidget->getSelectedImagePreview();
+    if (preview == nullptr)
+        return;
+    stitchWidget->removeImage(preview);
+}
+
 void MainWin::saveAllImages()
 {
     QVector<cv::Mat> mats = stitchWidget->getImages();

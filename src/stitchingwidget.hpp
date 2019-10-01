@@ -77,6 +77,13 @@ public:
     ///
     ImagePreview* getSelectedImagePreview();
 
+    ///
+    /// \brief Remove given image
+    /// \param imagePreview The image preview object
+    /// \return True if remove successfull, else false
+    ///
+    bool removeImage(ImagePreview *imagePreview);
+
 public slots:
     ///
     /// \brief Selection changed by mouse click

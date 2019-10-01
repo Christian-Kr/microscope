@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/edit-delete.svg</file>
+    <file>icons/edit-download.svg</file>
+    <file>icons/edit-select-all.svg</file>
     <file>icons/link.svg</file>
     <file>icons/application-exit.svg</file>
     <file>icons/document-open.svg</file>

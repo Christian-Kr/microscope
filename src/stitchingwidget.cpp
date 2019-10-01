@@ -88,6 +88,18 @@ void StitchingWidget::selectionChangedByMouse(bool state)
     }
 }
 
+bool StitchingWidget::removeImage(ImagePreview *imagePreview)
+{
+    int idx = previews->indexOf(imagePreview);
+    if (idx < 0)
+        return false;
+    ImagePreview *preview = previews->takeAt(idx);
+    delete preview;
+    mats->removeAt(idx);
+    updatePreviews();
+    return true;
+}
+
 void StitchingWidget::deselectAll()
 {
     for (int i = 0; i < previews->size(); i++) {
