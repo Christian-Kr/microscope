@@ -87,7 +87,7 @@ public:
     /// This function has not been programmed by myself! This one should be
     /// static cause it could be a helpful function for many points in this
     /// application.
-    /// @param mat OpenCV mat array
+    /// \param mat OpenCV mat array
     ///
     static QPixmap matToPixmap(cv::Mat mat);
 
@@ -281,7 +281,9 @@ private:
     bool cameraConnected;
     bool controllerConnected;
 
-    QThread* thread;
+    QThread *thread;
+    QLabel *labelStatusCamera;
+    QLabel *labelStatusController;
 
     LiveCamera* liveCamera;
     GuiMode guiMode;

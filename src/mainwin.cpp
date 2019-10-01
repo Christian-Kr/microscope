@@ -51,6 +51,8 @@ MainWin::MainWin(QWidget *parent, Qt::WindowFlags flags)
     cameraConnected(false),
     controllerConnected(false),
     thread(new QThread()),
+    labelStatusCamera(new QLabel(tr("Camera disconnected!"))),
+    labelStatusController(new QLabel(tr("Controller disconnected!"))),
     liveCamera(new LiveCamera()),
     guiMode(GuiMode::NORMAL),
     preview(new ImagePreview()),
@@ -73,6 +75,10 @@ MainWin::MainWin(QWidget *parent, Qt::WindowFlags flags)
     preview->setVisible(false);
     previewLiveCamera->setVisible(false);
     previewLiveCamera->setWindowTitle(tr("Live camera"));
+
+    // Add status labels
+    statusBar()->addPermanentWidget(labelStatusCamera);
+    statusBar()->addPermanentWidget(labelStatusController);
 
     // Update gui elements
     ui.tbCamera->setVisible(false);
@@ -141,9 +147,11 @@ bool MainWin::initCamera()
             this, tr("Initialize camera"),
             tr("Cannot connect the camera!")
         );
+        labelStatusCamera->setText(tr("Camera disconnected!"));
         return false;
     }
     statusBar()->showMessage(tr("Camera connected!"));
+    labelStatusCamera->setText(tr("Camera connected!"));
     return true;
 }
 
@@ -155,9 +163,11 @@ bool MainWin::initController()
             this, tr("Initialize camera"),
             tr("Cannot connect the controller!")
         );
+        labelStatusController->setText(tr("Controller disconnected!"));
         return false;
     }
     statusBar()->showMessage(tr("Controller connected!"));
+    labelStatusController->setText(tr("Controller connected!"));
     return true;
 }
 
@@ -168,6 +178,7 @@ void MainWin::connectController()
         controller->disconnectPort();
         ui.actConnController->setChecked(false);
         controllerConnected = false;
+        labelStatusController->setText(tr("Controller disconnected!"));
     } else {
         // Connect
         controllerConnected = initController();
@@ -184,6 +195,7 @@ void MainWin::connectCamera()
         // After the camera has been connected, start to show the live view.
         ui.tbCamera->setVisible(false);
         previewLiveCamera->setVisible(false);
+        labelStatusCamera->setText(tr("Camera disconnected!"));
     } else {
         // Connect
         cameraConnected = initCamera();
@@ -329,6 +341,29 @@ void MainWin::stitchImages()
     preview->setVisible(true);
 }
 
+void MainWin::openImage()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Open image file"), QDir::homePath()
+    );
+    if (fileName.isEmpty())
+        return;
+
+    cv::Mat matTmp = cv::imread(fileName.toStdString());
+    QPixmap tmpPix;
+    if (!tmpPix.load(fileName) || matTmp.data == nullptr) {
+        QMessageBox::warning(
+            this, tr("Cannot load image"),
+            tr("Cannot load image from file name!")
+        );
+        return;
+    }
+
+    matTmp.copyTo(currMat);
+    preview->setPixmap(tmpPix);
+    addImagePathToRecent(fileName);
+}
+
 // ---- NEW NEW NEW
 
 void MainWin::runCameraStitching()
@@ -451,8 +486,6 @@ void MainWin::exit()
     close();
 }
 
-
-
 void MainWin::updatePreview()
 {
     QPixmap pixTmp = matToPixmap(currMat);
@@ -476,29 +509,6 @@ void MainWin::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
     stitchWidget->setGeometry(0, 0, width(), stitchWidget->height());
-}
-
-void MainWin::openImage()
-{
-    QString fileName = QFileDialog::getOpenFileName(
-        this, tr("Open image file"), QDir::homePath()
-    );
-    if (fileName.isEmpty())
-        return;
-
-    cv::Mat matTmp = cv::imread(fileName.toStdString());
-    QPixmap tmpPix;
-    if (!tmpPix.load(fileName) || matTmp.data == nullptr) {
-        QMessageBox::warning(
-            this, tr("Cannot load image"),
-            tr("Cannot load image from file name!")
-        );
-        return;
-    }
-
-    matTmp.copyTo(currMat);
-    preview->setPixmap(tmpPix);
-    addImagePathToRecent(fileName);
 }
 
 void MainWin::updateRecentMenu()

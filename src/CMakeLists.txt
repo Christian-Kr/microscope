@@ -3,6 +3,7 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
 endif()
 
 add_executable(${PROJECT_NAME}
+    ${PROJECT_SOURCE_DIR}/rsrc/mainresources.qrc
     main.cpp
     mainwin.cpp
     controller.cpp
