@@ -34,7 +34,8 @@ StitchingWidget::StitchingWidget(QWidget *parent)
     layStitchImages(new QGridLayout(this)),
     previews(new QList<ImagePreview *>()),
     mats(new QVector<cv::Mat>()),
-    columns(5)
+    columns(5),
+    selected(nullptr)
 {
 }
 
@@ -58,7 +59,40 @@ void StitchingWidget::addImage(cv::Mat mat)
     preview->setVisible(true);
     preview->setPixmap(pix);
     previews->append(preview);
+    connect(
+        preview, &ImagePreview::selectionChanged, this, 
+        &StitchingWidget::selectionChangedByMouse
+    );
     updatePreviews();
+}
+
+void StitchingWidget::selectionChangedByMouse(bool state)
+{
+    if (!state) {
+        selected = nullptr;
+        return;
+    }
+    
+    QObject *obj = sender();
+    ImagePreview *preview = qobject_cast<ImagePreview *>(obj);
+    if (preview == nullptr)
+        return;
+    for (int i = 0; i < previews->size(); i++) {
+        if (previews->at(i) != preview)
+            previews->at(i)->setSelected(false);
+    }
+
+    if (selected != preview) {
+        selected = preview;
+        emit selectedImagePreviewChanged();
+    }
+}
+
+void StitchingWidget::deselectAll()
+{
+    for (int i = 0; i < previews->size(); i++) {
+        previews->at(i)->setSelected(false);
+    }
 }
 
 void StitchingWidget::updatePreviews()
@@ -102,4 +136,9 @@ QVector<cv::Mat> StitchingWidget::getImages() const
 void StitchingWidget::setColumns(int columns)
 {
     this->columns = columns;
+}
+
+ImagePreview* StitchingWidget::getSelectedImagePreview()
+{
+    return selected;
 }

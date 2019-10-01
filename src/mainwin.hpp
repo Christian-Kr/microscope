@@ -130,6 +130,11 @@ public slots:
     ///
     void takeImageFromCamera();
 
+    ///
+    /// \brief Save all images that are in the stitching widget
+    ///
+    void saveAllImages();
+
     /**
      * Show the about dialog
      */

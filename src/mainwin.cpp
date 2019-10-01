@@ -372,6 +372,28 @@ void MainWin::stitchImages()
     preview->setVisible(true);
 }
 
+void MainWin::saveAllImages()
+{
+    QVector<cv::Mat> mats = stitchWidget->getImages();
+
+    // Get a folder path
+    QString path = QFileDialog::getExistingDirectory(
+        this, tr("Folder for saving images"), QDir::homePath()
+    );
+    if (path.isEmpty())
+        return;
+    for (int i = 0; i < mats.size(); i++) {
+        cv::imwrite(
+            QString("%1/img_%2.png").arg(path).arg(i).toStdString(), 
+            mats.at(i)
+        );
+    }
+
+    QMessageBox::information(
+        this, tr("Save all images"), tr("All images have been saved!")
+    );
+}
+
 // ---- NEW NEW NEW
 
 void MainWin::abortCameraStitching()

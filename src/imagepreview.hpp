@@ -68,12 +68,30 @@ public:
     ///
     void setLabel(QString label);
 
+    ///
+    /// \brief Set the selection date
+    /// \param state True if selected, else false
+    ///
+    void setSelected(bool state);
+
+    ///
+    /// \brief Selection state
+    /// \return True if selected, else false
+    ///
+    bool isSelected() const;
+
 signals:
     ///
     /// \brief Pixmap height changed
     /// \param height The new height of the scaled image
     ///
     void pixmapHeightChanged(int height);
+
+    ///
+    /// \brief Emited when selection state changed
+    /// \param state The new state
+    ///
+    void selectionChanged(bool state);
 
 protected:
     ///
@@ -88,11 +106,18 @@ protected:
     ///
     virtual void closeEvent(QCloseEvent *) override;
 
+    ///
+    /// \brief Override mouse press event method
+    /// \param event The mouse press event
+    ///
+    virtual void mousePressEvent(QMouseEvent *event) override;
+
 private:
     QPixmap *pix;
     QPixmap *pixScaled;
     QString label;
     bool closeable;
+    bool selected;
 };
 
 

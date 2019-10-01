@@ -70,6 +70,26 @@ public:
     ///
     void updatePreviews();
 
+    ///
+    /// \brief Get the selected image preview object
+    /// \return Pointer to image preview object or nullptr if nothing is
+    /// selected
+    ///
+    ImagePreview* getSelectedImagePreview();
+
+public slots:
+    ///
+    /// \brief Selection changed by mouse click
+    /// \param state The new selection state
+    ///
+    void selectionChangedByMouse(bool state);
+
+signals:
+    ///
+    /// \brief Emited when the selected element changed
+    ///
+    void selectedImagePreviewChanged();
+
 protected:
     ///
     /// \brief Override resize event method from QWidget
@@ -82,9 +102,15 @@ protected:
     virtual void updateHeight();
 
 private:
+    ///
+    /// \brief Deselect all previews
+    ///
+    void deselectAll();
+
     QGridLayout *layStitchImages;
     QList<ImagePreview *> *previews;
     QVector<cv::Mat> *mats;
+    ImagePreview *selected;
     int columns;
 };
 

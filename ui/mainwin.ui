@@ -38,7 +38,7 @@
     <addaction name="mRecent"/>
     <addaction name="separator"/>
     <addaction name="actSaveImage"/>
-    <addaction name="actSaveResults"/>
+    <addaction name="actSaveAllImages"/>
     <addaction name="separator"/>
     <addaction name="actExit"/>
    </widget>
@@ -88,6 +88,28 @@
    </attribute>
    <addaction name="actTakeImage"/>
    <addaction name="actAutoCamStit"/>
+  </widget>
+  <widget class="QToolBar" name="tbStitchingTools">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
   </widget>
   <action name="actTakeImage">
    <property name="text">
@@ -191,7 +213,7 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actSaveResults">
+  <action name="actSaveAllImages">
    <property name="text">
     <string>Save all images</string>
    </property>
@@ -244,6 +266,14 @@
   <action name="actSwitchCameraView">
    <property name="text">
     <string>Switch Camera View</string>
+   </property>
+  </action>
+  <action name="actDeleteImage">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete selected image from previews</string>
    </property>
   </action>
  </widget>
@@ -475,6 +505,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actSaveAllImages</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWin</receiver>
+   <slot>saveAllImages()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>238</x>
+     <y>173</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actDeleteImage</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWin</receiver>
+   <slot>deleteImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>238</x>
+     <y>173</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>stitchImages()</slot>
@@ -494,5 +556,7 @@
   <slot>exit()</slot>
   <slot>openImage()</slot>
   <slot>clearRecentImages()</slot>
+  <slot>saveAllImages()</slot>
+  <slot>deleteImage()</slot>
  </slots>
 </ui>

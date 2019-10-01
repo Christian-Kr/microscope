@@ -28,7 +28,8 @@ ImagePreview::ImagePreview(QWidget *parent, bool closeable)
     : QWidget(parent),
     pix(new QPixmap()),
     pixScaled(new QPixmap()),
-    closeable(closeable)
+    closeable(closeable),
+    selected(false)
 {
 }
 
@@ -36,7 +37,8 @@ ImagePreview::ImagePreview(QString label, QWidget *parent, bool closeable)
     : QWidget(parent),
     pix(new QPixmap()),
     pixScaled(new QPixmap()),
-    closeable(closeable)
+    closeable(closeable),
+    selected(false)
 {
     this->label = label;
 }
@@ -94,6 +96,15 @@ void ImagePreview::paintEvent(QPaintEvent *)
         );
     }
 
+    // Paint border if selected
+    if (selected) {
+        QPen pen;
+        pen.setColor(Qt::darkGray);
+        pen.setWidth(5);
+        painter.setPen(pen);
+        painter.drawRect(0, 0, width(), height());
+    }
+
     if (height() != pixScaled->height())
         emit pixmapHeightChanged(pixScaled->height());
 }
@@ -109,4 +120,25 @@ void ImagePreview::closeEvent(QCloseEvent *event)
     // Do nothing! Tis window should not be closeable by the window system!
     if (!closeable)
         event->ignore();
+}
+
+void ImagePreview::setSelected(bool state)
+{
+    selected = state;
+    repaint();
+}
+
+bool ImagePreview::isSelected() const
+{
+    return selected;
+}
+
+void ImagePreview::mousePressEvent(QMouseEvent *event)
+{
+    if (event->buttons() == Qt::MouseButton::LeftButton) {
+        setSelected(!isSelected());
+        emit selectionChanged(isSelected());
+    } else {
+        QWidget::mousePressEvent(event);
+    }
 }
