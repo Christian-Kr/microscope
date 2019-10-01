@@ -55,8 +55,8 @@ MainWin::MainWin(QWidget *parent, Qt::WindowFlags flags)
     labelStatusController(new QLabel(tr("Controller disconnected!"))),
     liveCamera(new LiveCamera()),
     guiMode(GuiMode::NORMAL),
-    preview(new ImagePreview()),
-    previewLiveCamera(new ImagePreview()),
+    preview(new ImagePreview(nullptr)),
+    previewLiveCamera(new ImagePreview(nullptr, false)),
     layoutMain(new QVBoxLayout()),
     controller(new Controller()),
     gridNumMaxX(5),
@@ -236,7 +236,7 @@ void MainWin::liveCameraExit()
     ui.actConnCamera->setChecked(false);
 }
 
-void MainWin::takeImage()
+void MainWin::takeImageFromCamera()
 {
     cv::Mat liveMat;
     liveCamera->getCurrentImage().copyTo(liveMat);
@@ -302,43 +302,12 @@ void MainWin::controllerReady()
 {
     qDebug() << "Controller ready";
     if (guiMode == GuiMode::AUTOMATIC_CAMERA_STITCHING) {
-        takeImage();
+        takeImageFromCamera();
         if (!controller->hasReachedPosEnd())
             controller->moveToNextPos();
         else
             stitchImages();
     }
-}
-
-void MainWin::stitchImages()
-{
-    QPixmap tmpPix;
-    cv::Mat stitchedMat;
-
-    // No need to stitch, when there is only one in pipe
-    if (mats->size() > 1) {
-        // Stitch images
-        cv::Ptr<cv::Stitcher> stitcher = cv::Stitcher::create(
-            cv::Stitcher::SCANS, false
-        );
-        cv::Stitcher::Status status = stitcher->stitch(
-            mats->toStdVector(), stitchedMat
-        );
-
-        if (status != cv::Stitcher::OK) {
-            qDebug() << "ERROR: Cannot stitch images!";
-            return;
-        }
-
-        tmpPix = matToPixmap(stitchedMat);
-        stitchedMat.copyTo(currMat);
-    } else if (mats->size() == 1) {
-        tmpPix = matToPixmap(mats->first());
-    }
-
-    // Send picture to preview widget
-    preview->setPixmap(tmpPix);
-    preview->setVisible(true);
 }
 
 void MainWin::openImage()
@@ -364,18 +333,46 @@ void MainWin::openImage()
     addImagePathToRecent(fileName);
 }
 
-// ---- NEW NEW NEW
-
-void MainWin::runCameraStitching()
+void MainWin::stitchImages()
 {
-    // TODO: Do camera stitching
+    QPixmap tmpPix;
+    cv::Mat stitchedMat;
+    QVector<cv::Mat> mats = stitchWidget->getImages();
 
-    if (cameraConnected == false) {
-        cameraConnected = initCamera();
-        if (!cameraConnected)
+    // No need to stitch, when there is only one in pipe
+    if (mats.size() > 1) {
+        // Stitch images
+        cv::Ptr<cv::Stitcher> stitcher = cv::Stitcher::create(
+            cv::Stitcher::SCANS, false
+        );
+        cv::Stitcher::Status status = stitcher->stitch(
+            mats.toStdVector(), stitchedMat
+        );
+
+        if (status != cv::Stitcher::OK) {
+            QMessageBox::critical(
+                this, tr("Stitch Images"), tr("Cannot stitch images!")
+            );
             return;
+        }
+
+        tmpPix = matToPixmap(stitchedMat);
+        stitchedMat.copyTo(currMat);
+    } else if (mats.size() == 1) {
+        tmpPix = matToPixmap(mats.first());
+    } else {
+        QMessageBox::critical(
+            this, tr("Stitch Images"), tr("There are no images to stitch!")
+        );
+        return;
     }
+
+    // Send picture to preview widget
+    preview->setPixmap(tmpPix);
+    preview->setVisible(true);
 }
+
+// ---- NEW NEW NEW
 
 void MainWin::abortCameraStitching()
 {

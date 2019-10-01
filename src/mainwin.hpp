@@ -105,7 +105,7 @@ public slots:
     ///
     /// \brief Run the process of camera stitching
     ///
-    void runCameraStitching();
+    void stitchImages();
 
     ///
     /// \brief Run automatic image stitching
@@ -125,10 +125,10 @@ public slots:
     ///
     void abortAutoCameraStitching();
 
-    /**
-     * Take the image from the camera and make a stiched preview
-     */
-    void takeImage();
+    ///
+    /// \brief Take the image from the camera and make a stiched preview
+    ///
+    void takeImageFromCamera();
 
     /**
      * Show the about dialog
@@ -253,11 +253,6 @@ private:
      * @return True if controller available and connected, else false
      */
     bool initController();
-
-    /**
-     * Stitch images together
-     */
-    void stitchImages();
 
     /**
      * Live image from camera has been updated

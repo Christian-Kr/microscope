@@ -35,14 +35,16 @@ public:
     /// \brief Constructor
     /// \param parent Parent widget
     ///
-    explicit ImagePreview(QWidget *parent = nullptr);
+    explicit ImagePreview(
+        QWidget *parent = nullptr, bool closeable = true);
 
     ///
     /// \brief Overloaded constructor
     /// \param parent Parent widget
     /// \param label Label of the widget
     ///
-    explicit ImagePreview(QString label, QWidget *parent = nullptr);
+    explicit ImagePreview(
+        QString label, QWidget *parent = nullptr, bool closeable = true);
 
     ///
     /// \brief Destructor
@@ -90,6 +92,7 @@ private:
     QPixmap *pix;
     QPixmap *pixScaled;
     QString label;
+    bool closeable;
 };
 
 

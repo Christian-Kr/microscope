@@ -74,7 +74,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actAppendImage"/>
-   <addaction name="actStiching"/>
+   <addaction name="actImageStitching"/>
   </widget>
   <widget class="QToolBar" name="tbCamera">
    <property name="windowTitle">
@@ -100,13 +100,13 @@
     <string>Ctrl+T</string>
    </property>
   </action>
-  <action name="actStiching">
+  <action name="actImageStitching">
    <property name="icon">
     <iconset resource="../rsrc/mainresources.qrc">
      <normaloff>:/icons/icons/link.svg</normaloff>:/icons/icons/link.svg</iconset>
    </property>
    <property name="text">
-    <string>Stiching</string>
+    <string>Stitch</string>
    </property>
    <property name="toolTip">
     <string>Start stiching images on board</string>
@@ -447,7 +447,7 @@
    <sender>actTakeImage</sender>
    <signal>triggered()</signal>
    <receiver>MainWin</receiver>
-   <slot>takeImage()</slot>
+   <slot>takeImageFromCamera()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -459,11 +459,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actImageStitching</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWin</receiver>
+   <slot>stitchImages()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>238</x>
+     <y>173</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
-  <slot>runCameraStitching()</slot>
+  <slot>stitchImages()</slot>
   <slot>abortCameraStitching()</slot>
-  <slot>takeImage()</slot>
+  <slot>takeImageFromCamera()</slot>
   <slot>moveTest()</slot>
   <slot>abortAutoCameraStitching()</slot>
   <slot>runAutoCameraStitching()</slot>

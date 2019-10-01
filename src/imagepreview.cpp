@@ -24,17 +24,19 @@
 #include "imagepreview.hpp"
 
 
-ImagePreview::ImagePreview(QWidget *parent)
+ImagePreview::ImagePreview(QWidget *parent, bool closeable)
     : QWidget(parent),
     pix(new QPixmap()),
-    pixScaled(new QPixmap())
+    pixScaled(new QPixmap()),
+    closeable(closeable)
 {
 }
 
-ImagePreview::ImagePreview(QString label, QWidget *parent)
+ImagePreview::ImagePreview(QString label, QWidget *parent, bool closeable)
     : QWidget(parent),
     pix(new QPixmap()),
-    pixScaled(new QPixmap())
+    pixScaled(new QPixmap()),
+    closeable(closeable)
 {
     this->label = label;
 }
@@ -105,5 +107,6 @@ void ImagePreview::setPixmap(QPixmap &pix)
 void ImagePreview::closeEvent(QCloseEvent *event)
 {
     // Do nothing! Tis window should not be closeable by the window system!
-    event->ignore();
+    if (!closeable)
+        event->ignore();
 }
