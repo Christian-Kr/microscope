@@ -199,12 +199,12 @@ signals:
 
 protected:
     ///
-    /// Override close event from QMainWindow
+    /// \brief Override close event from QMainWindow
     ///
     virtual void closeEvent(QCloseEvent *event) override;
 
     ///
-    /// Override resize event from QMainWindow
+    /// \brief Override resize event from QMainWindow
     ///
     virtual void resizeEvent(QResizeEvent *event) override;
 
@@ -214,15 +214,15 @@ private:
     ///
     void buildConnections();
 
-    /**
-     * Update the recent menu
-     */
+    ///
+    /// \brief Update the recent menu
+    ///
     void updateRecentMenu();
 
-    /**
-     * Add given path of image to recent
-     * @param path Image file name
-     */
+    ///
+    /// \brief Add given path of image to recent
+    /// \param path Image file name
+    ///
     void addImagePathToRecent(QString &path);
 
     /**
