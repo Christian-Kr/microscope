@@ -74,6 +74,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actAppendImage"/>
+   <addaction name="actStiching"/>
   </widget>
   <widget class="QToolBar" name="tbCamera">
    <property name="windowTitle">
@@ -86,7 +87,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actTakeImage"/>
-   <addaction name="actStiching"/>
    <addaction name="actAutoCamStit"/>
   </widget>
   <action name="actTakeImage">
@@ -101,6 +101,10 @@
    </property>
   </action>
   <action name="actStiching">
+   <property name="icon">
+    <iconset resource="../rsrc/mainresources.qrc">
+     <normaloff>:/icons/icons/link.svg</normaloff>:/icons/icons/link.svg</iconset>
+   </property>
    <property name="text">
     <string>Stiching</string>
    </property>

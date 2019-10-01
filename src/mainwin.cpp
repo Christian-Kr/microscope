@@ -360,7 +360,7 @@ void MainWin::openImage()
     }
 
     matTmp.copyTo(currMat);
-    preview->setPixmap(tmpPix);
+    stitchWidget->addImage(matTmp);
     addImagePathToRecent(fileName);
 }
 
