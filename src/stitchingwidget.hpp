@@ -78,6 +78,20 @@ public:
     ImagePreview* getSelectedImagePreview();
 
     ///
+    /// \brief Get the selected image as opencv matrice
+    /// \return Selected image object. This method will always return an object
+    /// no matter if one is selected or not. You may check with mat.empty if
+    /// one is selected, or with isSelected metohd.
+    ///
+    cv::Mat getSelectedImage();
+
+    ///
+    /// \brief Get info if image is selected
+    /// \return True if one image is selected, else false
+    ///
+    bool isImageSelected() const;
+
+    ///
     /// \brief Remove given image
     /// \param imagePreview The image preview object
     /// \return True if remove successfull, else false
@@ -90,6 +104,11 @@ public slots:
     /// \param state The new selection state
     ///
     void selectionChangedByMouse(bool state);
+
+    /// 
+    /// \brief Show a single preview of emited preview
+    ///
+    void showSinglePreview();
 
 signals:
     ///
@@ -114,10 +133,11 @@ private:
     ///
     void deselectAll();
 
-    QGridLayout *layStitchImages;
-    QList<ImagePreview *> *previews;
-    QVector<cv::Mat> *mats;
-    ImagePreview *selected;
+    QGridLayout * layStitchImages;
+    QList<ImagePreview *> * previews;
+    QVector<cv::Mat> * mats;
+    ImagePreview * selected;
+    ImagePreview * previewSingle;
     int columns;
 };
 

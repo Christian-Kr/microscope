@@ -20,6 +20,8 @@
 #include <QtGui/QPainter>
 #include <QtCore/QDebug>
 #include <QtGui/QCloseEvent>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QHBoxLayout>
 
 #include "imagepreview.hpp"
 
@@ -109,13 +111,13 @@ void ImagePreview::paintEvent(QPaintEvent *)
         emit pixmapHeightChanged(pixScaled->height());
 }
 
-void ImagePreview::setPixmap(QPixmap &pix)
+void ImagePreview::setPixmap(QPixmap & pix)
 {
     *(this->pix) = pix;
     repaint();
 }
 
-void ImagePreview::closeEvent(QCloseEvent *event)
+void ImagePreview::closeEvent(QCloseEvent * event)
 {
     // Do nothing! Tis window should not be closeable by the window system!
     if (!closeable)
@@ -133,12 +135,24 @@ bool ImagePreview::isSelected() const
     return selected;
 }
 
-void ImagePreview::mousePressEvent(QMouseEvent *event)
+void ImagePreview::mousePressEvent(QMouseEvent * event)
 {
     if (event->buttons() == Qt::MouseButton::LeftButton) {
-        setSelected(!isSelected());
-        emit selectionChanged(isSelected());
+        // Only select a deselected element, but don't deselect a selected one
+        if (!isSelected()) {
+            setSelected(true);
+            emit selectionChanged(true);
+        }
     } else {
         QWidget::mousePressEvent(event);
+    }
+}
+
+void ImagePreview::mouseDoubleClickEvent(QMouseEvent * event)
+{
+    if (event->buttons() == Qt::MouseButton::LeftButton) {
+        emit showSinglePreview();
+    } else {
+        QWidget::mouseDoubleClickEvent(event);
     }
 }

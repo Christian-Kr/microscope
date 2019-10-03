@@ -380,6 +380,29 @@ void MainWin::deleteImage()
     stitchWidget->removeImage(preview);
 }
 
+void MainWin::saveSelectedImage()
+{
+    if (!stitchWidget->isImageSelected()) {
+        QMessageBox::critical(
+            this, tr("Save selected image"), 
+            tr("No image selected for saving!")
+        );
+        return;
+    }
+    cv::Mat mat = stitchWidget->getSelectedImage();
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Save selected image"), QDir::homePath()
+    );
+    if (fileName.isEmpty())
+        return;
+    if (!cv::imwrite(fileName.toStdString(), mat)) {
+        QMessageBox::critical(
+            this, tr("Save selected image"), 
+            tr("Error while saving image!")
+        );
+    }
+}
+
 void MainWin::saveAllImages()
 {
     QVector<cv::Mat> mats = stitchWidget->getImages();

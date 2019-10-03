@@ -136,6 +136,11 @@ public slots:
     void saveAllImages();
 
     ///
+    /// \brief Save the selected image
+    ///
+    void saveSelectedImage();
+
+    ///
     /// \brief Delete the current selected image
     ///
     void deleteImage();

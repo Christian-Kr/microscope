@@ -35,8 +35,11 @@ StitchingWidget::StitchingWidget(QWidget *parent)
     previews(new QList<ImagePreview *>()),
     mats(new QVector<cv::Mat>()),
     columns(5),
+    previewSingle(new ImagePreview()),
     selected(nullptr)
 {
+    previewSingle->setWindowTitle(tr("Single preview"));
+    previewSingle->setWindowModality(Qt::ApplicationModal);
 }
 
 StitchingWidget::~StitchingWidget()
@@ -47,6 +50,29 @@ StitchingWidget::~StitchingWidget()
     while (!previews->isEmpty())
         delete previews->takeFirst();
     delete previews;
+    delete previewSingle;
+}
+
+cv::Mat StitchingWidget::getSelectedImage()
+{
+    cv::Mat mat;
+    if (selected == nullptr)
+        return mat;
+
+    int idx = previews->indexOf(selected);
+    if (idx < 0)
+        return mat;
+    
+    mats->at(idx).copyTo(mat);
+    return mat;
+}
+
+bool StitchingWidget::isImageSelected() const
+{
+    if (selected == nullptr)
+        return false;
+    else
+        return true;
 }
 
 void StitchingWidget::addImage(cv::Mat mat)
@@ -62,6 +88,10 @@ void StitchingWidget::addImage(cv::Mat mat)
     connect(
         preview, &ImagePreview::selectionChanged, this, 
         &StitchingWidget::selectionChangedByMouse
+    );
+    connect(
+        preview, &ImagePreview::showSinglePreview, this,
+        &StitchingWidget::showSinglePreview
     );
     updatePreviews();
 }
@@ -105,6 +135,18 @@ void StitchingWidget::deselectAll()
     for (int i = 0; i < previews->size(); i++) {
         previews->at(i)->setSelected(false);
     }
+}
+
+void StitchingWidget::showSinglePreview()
+{
+    QObject * obj = QObject::sender();
+    ImagePreview * previewCalled = nullptr;
+    if (obj != nullptr)
+        previewCalled = qobject_cast<ImagePreview *>(obj);
+    
+    QPixmap pix = previewCalled->getPixmap();
+    previewSingle->setPixmap(pix);
+    previewSingle->show();
 }
 
 void StitchingWidget::updatePreviews()

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>478</width>
-    <height>348</height>
+    <width>825</width>
+    <height>766</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>478</width>
-     <height>18</height>
+     <width>825</width>
+     <height>43</height>
     </rect>
    </property>
    <widget class="QMenu" name="mFile">
@@ -29,7 +29,7 @@
     </property>
     <widget class="QMenu" name="mRecent">
      <property name="title">
-      <string>Recent images</string>
+      <string>Recent &amp;images</string>
      </property>
     </widget>
     <addaction name="actReset"/>
@@ -38,13 +38,14 @@
     <addaction name="mRecent"/>
     <addaction name="separator"/>
     <addaction name="actSaveImage"/>
+    <addaction name="actSaveSelectedImage"/>
     <addaction name="actSaveAllImages"/>
     <addaction name="separator"/>
     <addaction name="actExit"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
-     <string>&amp;Help</string>
+     <string>He&amp;lp</string>
     </property>
     <addaction name="actAbout"/>
    </widget>
@@ -150,7 +151,7 @@
   </action>
   <action name="actAbout">
    <property name="text">
-    <string>About Microscope</string>
+    <string>&amp;About Microscope</string>
    </property>
    <property name="toolTip">
     <string>Microscope information</string>
@@ -161,7 +162,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Connect controller</string>
+    <string>C&amp;onnect controller</string>
    </property>
   </action>
   <action name="actConnCamera">
@@ -169,12 +170,12 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Connect camera</string>
+    <string>Co&amp;nnect camera</string>
    </property>
   </action>
   <action name="actConnDevices">
    <property name="text">
-    <string>Connect all devices</string>
+    <string>&amp;Connect all devices</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
@@ -182,7 +183,7 @@
   </action>
   <action name="actDisconnDevices">
    <property name="text">
-    <string>Disconnect all devices</string>
+    <string>&amp;Disconnect all devices</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
@@ -194,15 +195,19 @@
      <normaloff>:/icons/icons/document-save.svg</normaloff>:/icons/icons/document-save.svg</iconset>
    </property>
    <property name="text">
-    <string>Save stitched image</string>
+    <string>&amp;Save stitched image</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actSaveAllImages">
+   <property name="icon">
+    <iconset resource="../rsrc/mainresources.qrc">
+     <normaloff>:/icons/icons/document-save-all.svg</normaloff>:/icons/icons/document-save-all.svg</iconset>
+   </property>
    <property name="text">
-    <string>Save all images</string>
+    <string>Sa&amp;ve all images</string>
    </property>
    <property name="toolTip">
     <string>Save the calculation results for particle distribution</string>
@@ -229,7 +234,7 @@
      <normaloff>:/icons/icons/edit-clear-history.svg</normaloff>:/icons/icons/edit-clear-history.svg</iconset>
    </property>
    <property name="text">
-    <string>Reset all</string>
+    <string>&amp;Reset all</string>
    </property>
    <property name="toolTip">
     <string>Reset the whole application</string>
@@ -244,7 +249,7 @@
      <normaloff>:/icons/icons/insert-image.svg</normaloff>:/icons/icons/insert-image.svg</iconset>
    </property>
    <property name="text">
-    <string>Append image</string>
+    <string>&amp;Append image</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -265,6 +270,14 @@
    </property>
    <property name="toolTip">
     <string>Delete selected image from previews</string>
+   </property>
+  </action>
+  <action name="actSaveSelectedImage">
+   <property name="text">
+    <string>Save selected image</string>
+   </property>
+   <property name="toolTip">
+    <string>Save the selected image</string>
    </property>
   </action>
  </widget>
@@ -528,6 +541,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actSaveSelectedImage</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWin</receiver>
+   <slot>saveSelectedImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>412</x>
+     <y>382</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>stitchImages()</slot>
@@ -549,5 +578,6 @@
   <slot>clearRecentImages()</slot>
   <slot>saveAllImages()</slot>
   <slot>deleteImage()</slot>
+  <slot>saveSelectedImage()</slot>
  </slots>
 </ui>

@@ -93,6 +93,11 @@ signals:
     ///
     void selectionChanged(bool state);
 
+    ///
+    /// \brief Emited when showing a preview has been asked
+    ///
+    void showSinglePreview();
+
 protected:
     ///
     /// \brief Override the paint event method to draw the image
@@ -110,11 +115,17 @@ protected:
     /// \brief Override mouse press event method
     /// \param event The mouse press event
     ///
-    virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void mousePressEvent(QMouseEvent * event) override;
+
+    ///
+    /// \brief Override double click event method
+    /// \method event The mouse click event
+    ///
+    virtual void mouseDoubleClickEvent(QMouseEvent * event) override;
 
 private:
-    QPixmap *pix;
-    QPixmap *pixScaled;
+    QPixmap * pix;
+    QPixmap * pixScaled;
     QString label;
     bool closeable;
     bool selected;
