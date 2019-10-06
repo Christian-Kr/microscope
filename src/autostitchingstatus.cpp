@@ -51,3 +51,9 @@ void AutoStitchingStatus::stopPressed()
 {
     emit stopAutoScanning();
 }
+
+void AutoStitchingStatus::setProgressInformation(int max, int curr)
+{
+    ui.progressBar->setMaximum(max);
+    ui.progressBar->setValue(curr);
+}
