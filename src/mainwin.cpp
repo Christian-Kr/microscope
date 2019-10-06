@@ -39,6 +39,7 @@
 #include "imagepreview.hpp"
 #include "controller.hpp"
 #include "stitchingwidget.hpp"
+#include "autostitchingstatus.hpp"
 
 
 // Initialize the singleton instance for working with it in static functions
@@ -61,10 +62,13 @@ MainWin::MainWin(QWidget *parent, Qt::WindowFlags flags)
     controller(new Controller()),
     gridNumMaxX(5),
     gridNumMaxY(5),
-    stitchWidget(new StitchingWidget())
+    stitchWidget(new StitchingWidget()),
+    statusWidget(new AutoStitchingStatus(tr(""), nullptr, false)),
+    stopAutoScanning(false)
 {
     ui.setupUi(this);
 
+    statusWidget->setWindowModality(Qt::ApplicationModal);
     liveCamera->moveToThread(thread);
     thread->start();
 
@@ -130,6 +134,15 @@ void MainWin::buildConnections()
     connect(
         controller, &Controller::ready, this, &MainWin::controllerReady
     );
+    connect(
+        statusWidget, &AutoStitchingStatus::stopAutoScanning, this,
+        &MainWin::stopAutoScanningProcess
+    );
+}
+
+void MainWin::stopAutoScanningProcess()
+{
+    stopAutoScanning = true;
 }
 
 bool MainWin::initCamera()
@@ -259,6 +272,9 @@ void MainWin::runAutoCameraStitching()
             return;
     }
 
+    // Show the status dialog
+    statusWidget->setVisible(true);
+
     // Change gui to auto camera stitching mode.
     guiMode = GuiMode::AUTOMATIC_CAMERA_STITCHING;
 
@@ -294,13 +310,28 @@ void MainWin::runAutoCameraStitching()
     controller->setMotorIntervall(stepsPerMoveX, stepsPerMoveY);
     controller->setMaxMoves(maxMovesX, maxMovesY);
 
+    // Set progress information
+    statusWidget->setLabel(
+        tr("Scanning picture number %1 from %2").arg(1).arg(
+            maxMovesX * maxMovesY
+        )
+    );
+    statusWidget->setProgressInformation(maxMovesX * maxMovesY, 1);
+
     // Start by moving motor once
+    stopAutoScanning = false;
     controller->moveToNextPos();
 }
 
 void MainWin::controllerReady()
 {
-    qDebug() << "Controller ready";
+    if (stopAutoScanning) {
+        stopAutoScanning = false;
+        takeImageFromCamera();
+        statusWidget->setVisible(false);
+        return;
+    }
+    
     if (guiMode == GuiMode::AUTOMATIC_CAMERA_STITCHING) {
         takeImageFromCamera();
         if (!controller->hasReachedPosEnd())

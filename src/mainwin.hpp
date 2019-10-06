@@ -35,6 +35,7 @@ class Controller;
 class QGridLayout;
 class QVBoxLayout;
 class StitchingWidget;
+class AutoStitchingStatus;
 
 ///
 /// Enum class for declaration of different gui modes:
@@ -205,6 +206,11 @@ public slots:
      */
     void updatePreview();
 
+    ///
+    /// \brief Stop the auto scanning process
+    ///
+    void stopAutoScanningProcess();
+
 signals:
     /**
      * Run camera
@@ -290,6 +296,7 @@ private:
 
     bool cameraConnected;
     bool controllerConnected;
+    bool stopAutoScanning;
 
     QThread *thread;
     QLabel *labelStatusCamera;
@@ -308,7 +315,8 @@ private:
     int gridNumMaxX;
     int gridNumMaxY;
 
-    StitchingWidget *stitchWidget;
+    StitchingWidget * stitchWidget;
+    AutoStitchingStatus * statusWidget;
 };
 
 

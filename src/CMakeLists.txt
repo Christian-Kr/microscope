@@ -10,6 +10,7 @@ add_executable(${PROJECT_NAME}
     livecamera.cpp
     stitchingwidget.cpp
     imagepreview.cpp
+    autostitchingstatus.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} 
