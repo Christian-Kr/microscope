@@ -33,6 +33,9 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QInputDialog>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 
 #include "mainwin.hpp"
 #include "livecamera.hpp"
@@ -150,9 +153,15 @@ bool MainWin::initCamera()
     // The camera will be initialized with opencv. There might be an option to
     // detect it with the help of qt. But this won't be used for now.
 
+    // For now, ... someone can enter a number for device, but it is up to the
+    // user, to be sure the device exists.
+    int device = QInputDialog::getInt(
+        this, tr("Enter camera number"), tr("Enter camera number beginning with 0")
+    );
+
     if (cap == nullptr) {
         // Try to get the first camera
-        cap = new cv::VideoCapture(0);
+        cap = new cv::VideoCapture(device);
     }
 
     if (!cap->isOpened()) {
@@ -170,7 +179,26 @@ bool MainWin::initCamera()
 
 bool MainWin::initController()
 {
-    controller->setDevice("/dev/ttyACM0");
+    // Get device name. Therefore get a list with all port infos objects
+    // and get the choosed value.
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+    if (ports.size() <= 0) {
+        QMessageBox::critical(
+            this, tr("Connect controller"), tr("No controlle available")
+        );
+        return false;
+    }
+    QList<QString> portNames;
+    for (int i = 0; i < ports.size(); i++) {
+        QSerialPortInfo portInfo = ports.at(i);
+        portNames.append(portInfo.systemLocation());
+    }
+    QString device = QInputDialog::getItem(
+        this, tr("Select device"), tr("Select device"), portNames
+    );
+    if (device.isEmpty())
+        return false;
+    controller->setDevice(device);
     if (!controller->connectPort()) {
         QMessageBox::critical(
             this, tr("Initialize camera"),
@@ -374,7 +402,7 @@ void MainWin::stitchImages()
     if (mats.size() > 1) {
         // Stitch images
         cv::Ptr<cv::Stitcher> stitcher = cv::Stitcher::create(
-            cv::Stitcher::SCANS, false
+            cv::Stitcher::SCANS
         );
         cv::Stitcher::Status status = stitcher->stitch(
             mats.toStdVector(), stitchedMat

@@ -7,6 +7,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS "${PROJECT_SOURCE_DIR}/ui")
 
+set(OpenCV_DIR "/Users/ckrippendorf/Programmierung/local/lib/cmake/opencv4")
 find_package(OpenCV REQUIRED)
 find_package(Qt5 COMPONENTS Widgets SerialPort REQUIRED)
 
